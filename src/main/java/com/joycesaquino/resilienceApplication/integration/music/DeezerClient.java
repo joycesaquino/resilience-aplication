@@ -1,28 +1,21 @@
 package com.joycesaquino.resilienceApplication.integration.music;
 
 import com.joycesaquino.resilienceApplication.model.Artist;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.Optional;
 
 @Component
 public interface DeezerClient {
     @GetMapping("/album")
+    @CircuitBreaker(name = "deezer", fallbackMethod = "getAlbumFallback")
     Album getAlbum(Long id);
 
-    default Optional<Album> getAlbumFallback(Long id, Artist artist) {
-
-        return artist.getAlbums()
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().equals(id))
-                .map(entry -> {
-                    var album = new Album();
-                    album.setId(entry.getKey());
-                    album.setTitle(entry.getValue());
-                    return album;
-                }).findAny();
+    default Album getAlbumFallback(Long id, Artist artist) {
+        var album = new Album();
+        album.setId(id);
+        album.setTitle(artist.getAlbums().get(id));
+        return album;
     }
 
 }
