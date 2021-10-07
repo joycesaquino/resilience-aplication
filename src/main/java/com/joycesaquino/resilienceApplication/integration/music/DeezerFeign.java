@@ -14,7 +14,8 @@ public class DeezerFeign {
     @Bean
     DeezerClient deezerClient(@Value("${api.deezer.url}") String deezerURL) {
         return Feign.builder()
-                .options(new Request.Options(10, TimeUnit.SECONDS, 60, TimeUnit.SECONDS, true))
+                .options(new Request.Options(150, TimeUnit.MILLISECONDS, 90, TimeUnit.MILLISECONDS, true))
                 .target(DeezerClient.class, deezerURL);
     }
+
 }
